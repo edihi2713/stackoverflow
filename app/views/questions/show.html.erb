@@ -1,0 +1,122 @@
+
+	<div class="container">
+	  <div class="row">
+	  
+	    <div class="col-md-10 col-md-offset-1">
+	      <%= link_to 'Volver', questions_path, class: 'btn btn-success'  %>
+			
+			
+			<div class="row">
+				<div class="col-md-1" style="margin-top: 30px;">
+					<% if @question.question_voted_by? current_user %>
+						<%= link_to question_vote_path(@question), method: :delete do %>
+						  <span class="glyphicon glyphicon-triangle-top"></span>
+						  <br>
+						  <span class="upvote-count"><%= @question.votes.count %></span>
+						<% end %>
+					<% else %>
+						  <%= link_to question_votes_path(@question), method: :post, class: "glyphicon glyphicon-triangle-top" do %>
+						  <br>
+						  		<span class="upvote-count"><%= @question.votes.count %></span>
+						  <% end %>
+					<% end %>	
+				</div>
+				<div class="col-md-8">
+					<h1><%= @question.title %></h1>
+				</div>
+			</div>	
+			
+
+	      <div class="jumbotron">
+	      	<%= markdown(@question.body) %>
+		      <hr>
+				  <div class="comments">
+				  	<% @question.comments.each do |comment| %>
+				  		<div class="panel panel-default">
+				  				<small><%= comment.user.email %> comentó hace <%= distance_of_time_in_words(Time.now,comment.created_at) %></small>
+				  		  <div class="panel-body">
+				  		    	<span><%= markdown(comment.content) %></span>
+				  		  </div>
+				  		</div>
+				  	<% end %>
+				  </div>
+					
+					<% if signed_in? %>
+						<%= form_for [@question, @question.comments.build] do |f| %>
+						  <div class="form-group">
+						    <%= f.text_area :content, class: "form-control", :required => 'required',placeholder: "Agregar Comentario" ,rows: 2 %>
+						    <%= f.hidden_field :commentable_type, :value => @question.class.name%>
+						  </div>
+
+						  <div class="actions text-right">
+						    <%= f.submit "Comentar Pregunta", class: "btn btn-primary" %>
+						  </div>
+						<% end %>
+					<% end %>
+			</div>
+			  <div class="answers well well-lg">
+
+
+			  	<p>Si conoces a alguien, contáctalo para que nos ayude</p>
+			  	<hr>
+				<% @question.answers.each do |answer| %> 
+					<% if answer.answer_voted_by? current_user %>
+						<%= link_to answer_vote_destroy_path(:answer_id => answer.id), method: :delete do %>
+						  <span class="glyphicon glyphicon-triangle-top"></span><br>
+						  <span class="upvote-count"><%= answer.votes.count %></span>
+						<% end %>
+					<% else %>
+						<%= link_to answer_vote_path(:answer_id => answer.id), method: :post, class: "glyphicon glyphicon-triangle-top" do %>
+						<br>
+						<span class="upvote-count"><%= answer.votes.count %></span>
+						<% end %>
+					<% end %>			
+			  	    <%= markdown(answer.body) %> <br> 
+
+
+			  	
+	  	  		  <div class="comments">
+	  	  		  	<% answer.comments.each do |comment| %>
+	  	  		  		<div class="panel panel-default">
+	  	  		  				<small><%= comment.user.email %> comentó hace <%= distance_of_time_in_words(Time.now,comment.created_at) %></small>
+	  	  		  		  <div class="panel-body">
+	  	  		  		    	<span><%= markdown(comment.content) %></span>
+	  	  		  		  </div>
+	  	  		  		</div>
+	  	  		  	
+	  	  		  	<% end %>
+	  	  		  </div>
+
+			  	  <% if signed_in? %>
+			  	  <div class="answerscomments">
+			  	  	<%= form_tag  "/comments/create" do %>
+			  	  	  <div class="form-group">
+			  	  	     <%= text_area_tag :content, params[:content], :required => 'required', class: 'form-control', :rows => 2 %>
+			  	  	    <%= hidden_field_tag 'commentable_type', "#{answer.class.name}"%>
+			  	  	    <%= hidden_field_tag 'commentable_id', "#{answer.id}"%>
+			  	  	  </div>
+
+			  	  	  <div class="actions text-right">
+			  	  	    <%= submit_tag "Comentar Respuesta", class: "btn btn-primary" %>
+			  	  	  </div>
+			  	  	<% end %>
+			  	  	</div>
+			  	  <% end %>
+			  	<% end %>
+			  	<% if signed_in? %>
+			  	<h3><strong>Tu respuesta:</strong></h3>
+			  	  <%= form_for [@question, @question.answers.build] do |f| %>
+			  	    <div class="form-group">
+			  	      <%= f.text_area :body,:required => 'required', class: "form-control", placeholder: "Enviar Respuesta" ,rows: 7 %>
+			  	    </div>
+
+			  	    <div class="actions text-right">
+			  	      <%= f.submit "Enviar Respuesta", class: "btn btn-primary" %>
+			  	    </div>
+			  	  <% end %>
+			  	<% end %>
+			  </div>
+		 </div>
+ </div>
+
+

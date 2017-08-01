@@ -1,0 +1,35 @@
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-10">
+    <div class="text-left">
+      <h1><strong>Preguntas</strong></h1>
+    </div>
+      <div class="text-right">
+        <%= link_to 'Hacer una pregunta', new_question_path,class: "btn btn-primary text-center" %>
+      </div>
+    </div>
+  </div>
+  <% @questions.each do |question| %>
+  <div class="row">
+      <hr>
+    <div class="col-md-2">
+       <h2 class="text-center"><%= question.answers.count%></h2>
+        <p class="text-muted text-center">Respuestas</p>
+    </div>
+    <div class="col-md-2">
+       <h2 class="text-center"><%= question.votes.count%></h2>
+        <p class="text-muted text-center">Votos</p>
+    </div>
+    <div class="col-md-8">
+      <h2><%= link_to "#{question.title}", question, class: 'questiontitle'  %></h2>
+      <p class="text-muted"> <%= question.user.email %> preguntó hace <%= distance_of_time_in_words(Time.now,question.created_at) %></p>
+      <% if user_signed_in? && current_user.email == question.user.email %>
+        <%= link_to 'Editar', edit_question_path(question), class: "glyphicon glyphicon-pencil" %>
+        <%= link_to 'Eliminar', question, class: "glyphicon glyphicon-trash", method: :delete, data: { confirm: 'Está seguro de eliminar esta pregunta?' } %>
+      <% end %>
+      <hr>
+    </div>
+  </div>
+  <% end %>  
+</div>
